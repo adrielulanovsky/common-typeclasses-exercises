@@ -2,7 +2,7 @@ package fpcourse
 
 import cats.implicits._
 import cats.kernel.laws.discipline.{EqTests, MonoidTests}
-import cats.laws.discipline.MonadErrorTests
+import cats.laws.discipline.{MonadErrorTests, MonadTests}
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.prop.Configuration
@@ -21,7 +21,7 @@ class GetSpec extends AnyFunSuite with Matchers with Configuration with FunSuite
 
   test("getIntLE fails on insufficient input") {
     val bytes = List[Byte](3, 1, 2)
-    Get.getIntBE.run(bytes) shouldBe(Left("Insufficient input"))
+    Get.getIntLE.run(bytes) shouldBe(Left("Insufficient input"))
   }
 
   test("getIntLE should read an int in little endian order") {
@@ -97,4 +97,9 @@ class GetSpec extends AnyFunSuite with Matchers with Configuration with FunSuite
    * TODO 12
    * Write discipline tests for instances of Monoid, Eq and MonadError.
    */
+  checkAll("Monoid[Get[Int]]", MonoidTests[Get[Int]].monoid)
+  checkAll("Eq[Get[Int]]", EqTests[Get[Int]].eqv)
+  checkAll("Monad[Get]", MonadTests[Get].monad[Int, Int, Int])
+  checkAll("MonadError[Get]", MonadErrorTests[Get, String].monadError[Int, Int, Int])
+
 }
